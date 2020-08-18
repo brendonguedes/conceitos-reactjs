@@ -1,29 +1,67 @@
-import React from "react";
-
+import React, { useState, useEffect } from "react";
+import { Form, Input } from '@rocketseat/unform'
+import api from './services/api'
+import { MdAddCircle } from 'react-icons/md'
+import { IoMdRemoveCircle } from 'react-icons/io'
 import "./styles.css";
 
+
 function App() {
-  async function handleAddRepository() {
-    // TODO
+  const [repositories, setRepositories] = useState([])
+
+  useEffect(() => {
+    api.get('repositories')
+      .then(res => {
+        setRepositories(res.data)
+      })
+  }, [])
+
+
+  async function handleAddRepository(data, { resetForm }) {
+  
+    const response = await api.post('repositories', {
+      title: `${data.repository}`,
+      url: "https://github.com/brendonguedes/",
+      techs: ["ReactJS", "React Native", "NodeJS"]
+    })
+    
+    const repository = response.data
+    setRepositories([...repositories, repository])
+    resetForm()
   }
 
+
   async function handleRemoveRepository(id) {
-    // TODO
+    await api.delete(`repositories/${id}`)
+    
+    const newRepositories = repositories.filter(
+      repository => repository.id !== id
+    )
+
+    setRepositories(newRepositories)
   }
 
   return (
-    <div>
-      <ul data-testid="repository-list">
-        <li>
-          Repositório 1
+    <div id="container">
+      <h1>Conceitos do ReactJS</h1>
+      <br/>
+      <div id="ul">
+        <ul data-testid="repository-list">
+        {repositories.map(repository => (<li key={repository.id}>{repository.title}
+            <button onClick={() => handleRemoveRepository(repository.id)}>
+              <IoMdRemoveCircle /> 
+              Remover
+            </button>
+            </li> ))
+            }
 
-          <button onClick={() => handleRemoveRepository(1)}>
-            Remover
-          </button>
-        </li>
-      </ul>
-
-      <button onClick={handleAddRepository}>Adicionar</button>
+        </ul>
+        <br/>
+        <Form onSubmit={handleAddRepository}>
+          <button type="submit"> <MdAddCircle /> Adicionar</button>
+          <Input name="repository" type="text" placeholder="Nome do repositório" />
+        </Form>
+      </div>     
     </div>
   );
 }
