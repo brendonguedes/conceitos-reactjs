@@ -22,7 +22,7 @@ function App() {
     const response = await api.post('repositories', {
       title: `${data.repository}`,
       url: "https://github.com/brendonguedes/",
-      techs: ["ReactJS", "React Native", "NodeJS"]
+      techs: ["ReactJS", "React Native", "NodeJS", "Docker", "NextJS"]
     })
     
     const repository = response.data
